@@ -125,14 +125,14 @@ export default function IntakeForm({ onSubmit, isLoading }: IntakeFormProps) {
   const [profile, setProfile] = useState<StudentProfile>({
     field: "Computer Science",
     degree: "Master's",
-    countries: ["United States", "United Kingdom", "Canada"],
-    locations: ["California / Silicon Valley"],
+    countries: ["United Kingdom", "Canada"],
+    locations: [],
     budgetUSD: 50000,
     intakeTerm: "Fall 2026",
-    gpaPercent: 85,
-    ielts: 7.0,
-    greGmat: 320,
-    customQuery: "STEM designated with co-op / internship opportunities",
+    gpaPercent: undefined,
+    ielts: undefined,
+    greGmat: undefined,
+    customQuery: "",
   });
 
   const [fieldSelection, setFieldSelection] = useState<string>("Computer Science");
@@ -356,11 +356,10 @@ export default function IntakeForm({ onSubmit, isLoading }: IntakeFormProps) {
                   key={deg}
                   type="button"
                   onClick={() => setProfile({ ...profile, degree: deg })}
-                  className={`py-2 px-2 text-xs font-semibold rounded-lg border transition-all ${
-                    profile.degree === deg
-                      ? "bg-stone-900 text-stone-50 border-stone-900 shadow-sm"
-                      : "bg-white text-stone-700 border-stone-200 hover:bg-stone-50"
-                  }`}
+                  className={`py-2 px-2 text-xs font-semibold rounded-lg border transition-all ${profile.degree === deg
+                    ? "bg-stone-900 text-stone-50 border-stone-900 shadow-sm"
+                    : "bg-white text-stone-700 border-stone-200 hover:bg-stone-50"
+                    }`}
                 >
                   {deg}
                 </button>
@@ -424,11 +423,10 @@ export default function IntakeForm({ onSubmit, isLoading }: IntakeFormProps) {
                   key={country}
                   type="button"
                   onClick={() => toggleCountry(country)}
-                  className={`text-xs px-3 py-1.5 rounded-full border font-medium transition-all ${
-                    selected
-                      ? "bg-emerald-800 text-emerald-50 border-emerald-800 shadow-sm"
-                      : "bg-white text-stone-700 border-stone-200 hover:bg-stone-100"
-                  }`}
+                  className={`text-xs px-3 py-1.5 rounded-full border font-medium transition-all ${selected
+                    ? "bg-emerald-800 text-emerald-50 border-emerald-800 shadow-sm"
+                    : "bg-white text-stone-700 border-stone-200 hover:bg-stone-100"
+                    }`}
                 >
                   {selected ? "✓ " : "+ "}
                   {country}
@@ -512,14 +510,12 @@ export default function IntakeForm({ onSubmit, isLoading }: IntakeFormProps) {
               role="switch"
               aria-checked={hasSpecificLocations}
               onClick={() => handleToggleSpecificLocations(!hasSpecificLocations)}
-              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                hasSpecificLocations ? "bg-amber-800" : "bg-stone-300"
-              }`}
+              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${hasSpecificLocations ? "bg-amber-800" : "bg-stone-300"
+                }`}
             >
               <span
-                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                  hasSpecificLocations ? "translate-x-5" : "translate-x-0"
-                }`}
+                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${hasSpecificLocations ? "translate-x-5" : "translate-x-0"
+                  }`}
               />
             </button>
           </div>
@@ -537,11 +533,10 @@ export default function IntakeForm({ onSubmit, isLoading }: IntakeFormProps) {
                       key={loc}
                       type="button"
                       onClick={() => toggleLocation(loc)}
-                      className={`text-[11px] px-2.5 py-1 rounded-md border transition-all font-medium ${
-                        selected
-                          ? "bg-amber-800 text-amber-50 border-amber-800 shadow-2xs"
-                          : "bg-white text-stone-700 border-stone-200 hover:bg-stone-100"
-                      }`}
+                      className={`text-[11px] px-2.5 py-1 rounded-md border transition-all font-medium ${selected
+                        ? "bg-amber-800 text-amber-50 border-amber-800 shadow-2xs"
+                        : "bg-white text-stone-700 border-stone-200 hover:bg-stone-100"
+                        }`}
                     >
                       {selected ? "✓ " : "+ "}
                       {loc}

@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #fbf9f5;
+  --foreground: #1c1917;
+}
+
+body {
+  color: var(--foreground);
+  background-color: var(--background);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  -webkit-font-smoothing: antialiased;
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(0.98); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, #f5f0e8 25%, #eae2d4 50%, #f5f0e8 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.8s infinite;
+}
+
+.paper-card {
+  background: #ffffff;
+  border: 1px solid #e7dfd5;
+  box-shadow: 0 2px 8px -2px rgba(45, 36, 30, 0.05), 0 12px 24px -6px rgba(45, 36, 30, 0.04);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.paper-card:hover {
+  border-color: #d2c4b2;
+  box-shadow: 0 4px 12px -2px rgba(45, 36, 30, 0.08), 0 16px 32px -6px rgba(45, 36, 30, 0.08);
+}

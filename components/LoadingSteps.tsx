@@ -16,27 +16,35 @@ export default function LoadingSteps({
 }: LoadingStepsProps) {
   if (currentStage === "complete" || currentStage === "idle") return null;
 
-  const steps = [
+  interface StepItem {
+    id: string;
+    title: string;
+    description: string;
+    icon: React.ComponentType<{ className?: string }>;
+    status: "active" | "done" | "waiting";
+  }
+
+  const steps: StepItem[] = [
     {
       id: "search",
       title: "Discovering Accredited Programmes",
       description: "Searching official university admissions portals for degree matches",
       icon: Search,
-      status: "active" as const,
+      status: "active",
     },
     {
       id: "grounding",
       title: "Grounding Live Tuition & Deadlines",
       description: "Extracting current international tuition, intake deadlines, and currency rates",
       icon: Sparkles,
-      status: "active" as const,
+      status: "active",
     },
     {
       id: "scholarships",
       title: "Verifying Scholarships & Custom Inquiries",
       description: "Checking merit awards, STEM status, and bespoke counsellor requirements",
       icon: Award,
-      status: "active" as const,
+      status: "active",
     },
   ];
 

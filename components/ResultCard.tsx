@@ -16,6 +16,10 @@ import {
   HelpCircle,
   TrendingUp,
   Globe,
+  BookOpen,
+  FileCheck,
+  Check,
+  Layers,
 } from "lucide-react";
 
 interface ResultCardProps {
@@ -68,16 +72,16 @@ export default function ResultCard({ result, studentBudget }: ResultCardProps) {
   const live = result.live;
   const scoreConfig = getScoreColor(result.score);
 
-  // Budget comparison
+  // Budget comparison (INR)
   const isOverBudget =
-    typeof live?.tuitionUSD === "number" &&
+    typeof live?.tuitionINR === "number" &&
     typeof studentBudget === "number" &&
     studentBudget > 0 &&
-    live.tuitionUSD > studentBudget;
+    live.tuitionINR > studentBudget;
 
   const budgetDifference =
-    isOverBudget && live?.tuitionUSD
-      ? live.tuitionUSD - studentBudget
+    isOverBudget && live?.tuitionINR
+      ? live.tuitionINR - studentBudget
       : 0;
 
   return (
@@ -144,20 +148,112 @@ export default function ResultCard({ result, studentBudget }: ResultCardProps) {
           </div>
         )}
 
-        {/* Minimum Entry Criteria */}
-        <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-stone-600 bg-stone-50/80 p-2.5 rounded-lg border border-stone-200/70">
-          <div>
-            <span className="text-stone-400">Min IELTS: </span>
-            <span className="font-semibold text-stone-800">
-              {result.ieltsMin ? `${result.ieltsMin} Band` : "N/A"}
+        {/* Scoring & Comprehensive Eligibility Criteria */}
+        <div className="mt-3.5 pt-3 border-t border-stone-200/90 space-y-2.5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-stone-800 flex items-center gap-1.5">
+              <FileCheck className="w-3.5 h-3.5 text-amber-700" />
+              Admission & Eligibility Criteria
+            </span>
+            <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">
+              Entry Requirements
             </span>
           </div>
-          <div>
-            <span className="text-stone-400">Min Academic GPA: </span>
-            <span className="font-semibold text-stone-800">
-              {result.gpaMinPercent ? `${result.gpaMinPercent}%` : "N/A"}
-            </span>
+
+          {/* Academic Background Requirement */}
+          <div className="text-xs p-2.5 rounded-lg bg-stone-50 border border-stone-200/80">
+            <div className="flex items-start gap-1.5">
+              <GraduationCap className="w-3.5 h-3.5 text-stone-600 shrink-0 mt-0.5" />
+              <div>
+                <span className="text-[11px] font-semibold text-stone-700 block">
+                  Academic & Degree Requirement:
+                </span>
+                <span className="text-stone-900 font-medium leading-relaxed">
+                  {result.eligibility?.minAcademicRequirement ||
+                    `Min Academic GPA: ${result.gpaMinPercent || 65}% / Relevant Bachelor's Degree`}
+                </span>
+              </div>
+            </div>
           </div>
+
+          {/* Language Proficiency Cutoffs */}
+          <div className="text-xs p-2.5 rounded-lg bg-stone-50 border border-stone-200/80 space-y-1.5">
+            <div className="text-[11px] font-semibold text-stone-700 flex items-center gap-1">
+              <Globe className="w-3 h-3 text-stone-500" />
+              Accepted Language Tests & Minimum Scores:
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-[11px]">
+              <div className="bg-white px-2 py-1 rounded border border-stone-200 font-medium">
+                <span className="text-stone-500 block text-[10px]">IELTS</span>
+                <span className="font-semibold text-stone-900">
+                  {result.eligibility?.languageRequirements?.ielts || (result.ieltsMin ? `${result.ieltsMin} Overall` : "6.5 Overall")}
+                </span>
+              </div>
+              <div className="bg-white px-2 py-1 rounded border border-stone-200 font-medium">
+                <span className="text-stone-500 block text-[10px]">TOEFL iBT</span>
+                <span className="font-semibold text-stone-900">
+                  {result.eligibility?.languageRequirements?.toefl || "88 - 90"}
+                </span>
+              </div>
+              <div className="bg-white px-2 py-1 rounded border border-stone-200 font-medium">
+                <span className="text-stone-500 block text-[10px]">PTE Academic</span>
+                <span className="font-semibold text-stone-900">
+                  {result.eligibility?.languageRequirements?.pte || "60 - 62"}
+                </span>
+              </div>
+              <div className="bg-white px-2 py-1 rounded border border-stone-200 font-medium">
+                <span className="text-stone-500 block text-[10px]">Duolingo (DET)</span>
+                <span className="font-semibold text-stone-900">
+                  {result.eligibility?.languageRequirements?.duolingo || "115+"}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Standardized Tests, Work Ex & Prerequisites */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+            {/* Standardized Tests (GRE/GMAT) */}
+            <div className="p-2.5 rounded-lg bg-stone-50 border border-stone-200/80">
+              <span className="text-[11px] font-semibold text-stone-700 block">
+                Standardized Exams:
+              </span>
+              <span className="text-stone-900 font-medium text-[11px]">
+                {result.eligibility?.standardizedTests?.gre ? (
+                  `GRE: ${result.eligibility.standardizedTests.gre}`
+                ) : result.eligibility?.standardizedTests?.gmat ? (
+                  `GMAT: ${result.eligibility.standardizedTests.gmat}`
+                ) : (
+                  "GRE/GMAT Optional or Waived"
+                )}
+              </span>
+            </div>
+
+            {/* Work Experience / Prerequisites */}
+            <div className="p-2.5 rounded-lg bg-stone-50 border border-stone-200/80">
+              <span className="text-[11px] font-semibold text-stone-700 block">
+                Work Experience & Backlogs:
+              </span>
+              <span className="text-stone-900 font-medium text-[11px]">
+                {result.eligibility?.workExperience || "Not mandatory"}
+                {result.eligibility?.backlogsAccepted ? ` • ${result.eligibility.backlogsAccepted}` : ""}
+              </span>
+            </div>
+          </div>
+
+          {/* Prerequisites / Document Checklist */}
+          {result.eligibility?.prerequisites && result.eligibility.prerequisites.length > 0 && (
+            <div className="text-[11px] p-2 rounded-lg bg-[#f9f7f4] border border-[#e8dfd1] text-stone-700 flex flex-wrap items-center gap-1.5">
+              <span className="font-semibold text-stone-800">Prerequisites / Coursework:</span>
+              {result.eligibility.prerequisites.map((req, rIdx) => (
+                <span
+                  key={rIdx}
+                  className="px-1.5 py-0.5 bg-white rounded border border-stone-200 text-stone-800 font-medium"
+                >
+                  ✓ {req}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -209,16 +305,21 @@ export default function ResultCard({ result, studentBudget }: ResultCardProps) {
             {/* Tuition */}
             <div className="flex items-start justify-between p-2.5 rounded-lg bg-stone-50 border border-stone-200/80">
               <div className="flex items-center gap-2">
-                <div className="p-1 rounded bg-stone-200/70 text-stone-700">
-                  <DollarSign className="w-3.5 h-3.5" />
+                <div className="w-6 h-6 rounded bg-stone-200/70 text-stone-700 font-bold text-xs flex items-center justify-center shrink-0">
+                  ₹
                 </div>
                 <div>
                   <div className="text-[11px] text-stone-500 font-medium">
                     Annual International Tuition
                   </div>
                   <div className="text-sm font-bold text-stone-900">
-                    {live.tuitionUSD !== null ? (
-                      `$${live.tuitionUSD.toLocaleString()} USD/year`
+                    {live.tuitionINR !== null ? (
+                      <span className="flex flex-wrap items-baseline gap-1.5">
+                        <span>₹{live.tuitionINR.toLocaleString("en-IN")}/yr</span>
+                        <span className="text-[11px] font-medium text-stone-500">
+                          (≈ ₹{(live.tuitionINR / 100000).toFixed(1)} L)
+                        </span>
+                      </span>
                     ) : (
                       <span className="text-stone-500 italic font-normal">
                         See official fee schedule
@@ -230,12 +331,12 @@ export default function ResultCard({ result, studentBudget }: ResultCardProps) {
 
               {/* Over Budget Alert */}
               {isOverBudget ? (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200 shrink-0">
                   <AlertTriangle className="w-3 h-3 text-rose-600" />
-                  +${budgetDifference.toLocaleString()} Over Budget
+                  +₹{budgetDifference.toLocaleString("en-IN")} Over
                 </span>
-              ) : live.tuitionUSD && studentBudget > 0 ? (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+              ) : live.tuitionINR && studentBudget > 0 ? (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
                   <CheckCircle className="w-3 h-3 text-emerald-600" />
                   Within Budget
                 </span>

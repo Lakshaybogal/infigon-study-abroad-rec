@@ -182,7 +182,7 @@ export default function PathfinderPage() {
                 <ResultCard
                   key={result.id}
                   result={result}
-                  studentBudget={currentProfile?.budgetUSD || 0}
+                  studentBudget={currentProfile?.budgetINR || 0}
                 />
               ))}
             </div>

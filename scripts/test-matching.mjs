@@ -7,7 +7,7 @@ const ukProfile = {
   field: "Computer Science",
   degree: "Master's",
   countries: ["United Kingdom"],
-  budgetUSD: 50000,
+  budgetINR: 4000000,
   intakeTerm: "Fall 2026",
   gpaPercent: 85,
   ielts: 7.5,

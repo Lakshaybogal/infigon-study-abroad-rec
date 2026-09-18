@@ -35,7 +35,7 @@ export default function LoadingSteps({
     {
       id: "grounding",
       title: "Grounding Live Tuition & Deadlines",
-      description: "Extracting current international tuition, intake deadlines, and currency rates",
+      description: "Extracting current international tuition in INR (₹), intake deadlines, and currency rates",
       icon: Sparkles,
       status: "active",
     },

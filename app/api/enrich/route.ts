@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
         error: "Failed to enrich programme facts",
         details: error?.message,
         liveFact: {
-          tuitionUSD: null,
+          tuitionINR: null,
           deadline: null,
           scholarship: null,
           sources: [],

@@ -60,6 +60,21 @@ const SUGGESTED_LOCATIONS = [
   "Dublin / Silicon Docks",
 ];
 
+const COMMON_EXAMS = [
+  "IELTS",
+  "TOEFL iBT",
+  "PTE Academic",
+  "Duolingo (DET)",
+  "GRE",
+  "GMAT",
+  "SAT",
+  "ACT",
+  "German (TestDaF / Goethe)",
+  "French (DELF / DALF)",
+  "GATE",
+  "OTHER_CUSTOM_EXAM",
+];
+
 const PRESETS: { label: string; profile: StudentProfile }[] = [
   {
     label: "Top AI & CS Master's",
@@ -68,11 +83,13 @@ const PRESETS: { label: string; profile: StudentProfile }[] = [
       degree: "Master's",
       countries: ["United States", "United Kingdom", "Canada", "Singapore"],
       locations: ["California / Silicon Valley", "Boston / Cambridge"],
-      budgetUSD: 60000,
+      budgetINR: 5000000,
       intakeTerm: "Fall 2026",
-      gpaPercent: 88,
-      ielts: 7.5,
-      greGmat: 325,
+      academicScore: "88% (8.8 / 10 CGPA)",
+      testScores: [
+        { name: "IELTS", score: "7.5", category: "Language" },
+        { name: "GRE", score: "325", category: "Standardized" },
+      ],
       customQuery: "Must be STEM designated with 3-year OPT",
     },
   },
@@ -83,10 +100,13 @@ const PRESETS: { label: string; profile: StudentProfile }[] = [
       degree: "Master's",
       countries: ["Germany", "Netherlands"],
       locations: ["Munich / Bavaria", "Delft"],
-      budgetUSD: 15000,
+      budgetINR: 1200000,
       intakeTerm: "Winter 2026 / Spring 2027",
-      gpaPercent: 80,
-      ielts: 7.0,
+      academicScore: "80% (3.2 / 4.0 GPA)",
+      testScores: [
+        { name: "IELTS", score: "7.0", category: "Language" },
+        { name: "German (TestDaF)", score: "B2/C1", category: "Language" },
+      ],
       customQuery: "Has Co-op / Internship tracks and English curriculum",
     },
   },
@@ -97,10 +117,13 @@ const PRESETS: { label: string; profile: StudentProfile }[] = [
       degree: "Bachelor's",
       countries: ["United States", "Canada"],
       locations: ["Toronto / Ontario", "California / Silicon Valley"],
-      budgetUSD: 45000,
+      budgetINR: 3500000,
       intakeTerm: "Fall 2026",
-      gpaPercent: 86,
-      ielts: 7.0,
+      academicScore: "86% (12th Board / High School)",
+      testScores: [
+        { name: "SAT", score: "1420", category: "Standardized" },
+        { name: "IELTS", score: "7.0", category: "Language" },
+      ],
       customQuery: "Co-op placement rate in tech industry",
     },
   },
@@ -111,11 +134,13 @@ const PRESETS: { label: string; profile: StudentProfile }[] = [
       degree: "Master's",
       countries: ["United Kingdom", "Australia", "Singapore"],
       locations: ["London / SE England", "Singapore"],
-      budgetUSD: 75000,
+      budgetINR: 6000000,
       intakeTerm: "Fall 2026",
-      gpaPercent: 78,
-      ielts: 7.5,
-      greGmat: 710,
+      academicScore: "78% (First Class)",
+      testScores: [
+        { name: "GMAT", score: "710", category: "Standardized" },
+        { name: "IELTS", score: "7.5", category: "Language" },
+      ],
       customQuery: "Post-study work visa eligible and consulting links",
     },
   },
@@ -127,11 +152,13 @@ export default function IntakeForm({ onSubmit, isLoading }: IntakeFormProps) {
     degree: "Master's",
     countries: ["United Kingdom", "Canada"],
     locations: [],
-    budgetUSD: 50000,
+    budgetINR: 4000000,
     intakeTerm: "Fall 2026",
-    gpaPercent: undefined,
-    ielts: undefined,
-    greGmat: undefined,
+    academicScore: "82% (8.2 / 10 CGPA)",
+    testScores: [
+      { name: "IELTS", score: "7.5", category: "Language" },
+      { name: "GRE", score: "320", category: "Standardized" },
+    ],
     customQuery: "",
   });
 
@@ -140,6 +167,11 @@ export default function IntakeForm({ onSubmit, isLoading }: IntakeFormProps) {
   const [customCountryInput, setCustomCountryInput] = useState("");
   const [showAddCountry, setShowAddCountry] = useState(false);
   const [customLocationInput, setCustomLocationInput] = useState("");
+
+  // Dynamic test score adder state
+  const [selectedExamType, setSelectedExamType] = useState<string>("IELTS");
+  const [customExamName, setCustomExamName] = useState<string>("");
+  const [examScoreInput, setExamScoreInput] = useState<string>("");
 
   const toggleCountry = (country: string) => {
     setProfile((prev) => {
@@ -208,6 +240,58 @@ export default function IntakeForm({ onSubmit, isLoading }: IntakeFormProps) {
     }));
   };
 
+  const handleAddTestScore = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const examName =
+      selectedExamType === "OTHER_CUSTOM_EXAM"
+        ? customExamName.trim()
+        : selectedExamType;
+    const scoreVal = examScoreInput.trim();
+
+    if (!examName || !scoreVal) return;
+
+    setProfile((prev) => {
+      const existing = prev.testScores || [];
+      const updated = existing.filter(
+        (t) => t.name.toLowerCase() !== examName.toLowerCase()
+      );
+      return {
+        ...prev,
+        testScores: [
+          ...updated,
+          {
+            name: examName,
+            score: scoreVal,
+            category: [
+              "IELTS",
+              "TOEFL iBT",
+              "PTE Academic",
+              "Duolingo (DET)",
+              "German (TestDaF / Goethe)",
+              "French (DELF / DALF)",
+            ].includes(examName)
+              ? "Language"
+              : "Standardized",
+          },
+        ],
+      };
+    });
+
+    setExamScoreInput("");
+    if (selectedExamType === "OTHER_CUSTOM_EXAM") {
+      setCustomExamName("");
+    }
+  };
+
+  const handleRemoveTestScore = (examNameToRemove: string) => {
+    setProfile((prev) => ({
+      ...prev,
+      testScores: (prev.testScores || []).filter(
+        (t) => t.name !== examNameToRemove
+      ),
+    }));
+  };
+
   const handleFieldDropdownChange = (val: string) => {
     setFieldSelection(val);
     if (val !== "OTHER_CUSTOM") {
@@ -243,11 +327,10 @@ export default function IntakeForm({ onSubmit, isLoading }: IntakeFormProps) {
       degree: "Master's",
       countries: [],
       locations: [],
-      budgetUSD: 40000,
+      budgetINR: 3500000,
       intakeTerm: "Fall 2026",
-      gpaPercent: undefined,
-      ielts: undefined,
-      greGmat: undefined,
+      academicScore: "",
+      testScores: [],
       customQuery: "",
     });
     setFieldSelection("OTHER_CUSTOM");
@@ -371,28 +454,33 @@ export default function IntakeForm({ onSubmit, isLoading }: IntakeFormProps) {
           <div className="md:col-span-4">
             <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">
               <span className="flex items-center gap-1.5">
-                <DollarSign className="w-3.5 h-3.5 text-stone-500" />
-                Annual Tuition Budget (USD)
+                <span className="font-serif font-bold text-stone-600">₹</span>
+                Annual Tuition Budget (INR)
               </span>
             </label>
             <div className="relative">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 font-semibold text-sm">
-                $
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-500 font-semibold text-sm">
+                ₹
               </span>
               <input
                 type="number"
                 min="0"
-                step="1000"
-                value={profile.budgetUSD}
+                step="50000"
+                value={profile.budgetINR}
                 onChange={(e) =>
                   setProfile({
                     ...profile,
-                    budgetUSD: parseFloat(e.target.value) || 0,
+                    budgetINR: parseFloat(e.target.value) || 0,
                   })
                 }
                 className="w-full pl-8 pr-3.5 py-2.5 rounded-lg border border-stone-300 text-sm bg-stone-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-700/20 focus:border-amber-700 transition-all font-semibold text-stone-900"
               />
             </div>
+            {profile.budgetINR > 0 && (
+              <p className="text-[11px] text-stone-500 mt-1">
+                ≈ ₹{(profile.budgetINR / 100000).toFixed(profile.budgetINR % 100000 === 0 ? 0 : 2)} Lakhs (₹{profile.budgetINR.toLocaleString("en-IN")})
+              </p>
+            )}
           </div>
         </div>
 
@@ -593,88 +681,172 @@ export default function IntakeForm({ onSubmit, isLoading }: IntakeFormProps) {
           )}
         </div>
 
-        {/* Section 3: Academic Scores & Intake Term */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 pt-1">
-          {/* Target Intake Term (4 cols) */}
-          <div className="md:col-span-4">
-            <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">
-              <span className="flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 text-stone-500" />
-                Target Intake Term
+        {/* Section 3: Academic Background & Foreign Education Exams */}
+        <div className="p-4 rounded-xl bg-stone-50/80 border border-stone-200/80 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+            {/* Target Intake Term (5 cols) */}
+            <div className="md:col-span-5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">
+                <span className="flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5 text-stone-500" />
+                  Target Intake Term
+                </span>
+              </label>
+              <select
+                value={profile.intakeTerm}
+                onChange={(e) => setProfile({ ...profile, intakeTerm: e.target.value })}
+                className="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-amber-700/20 focus:border-amber-700 transition-all font-medium text-stone-900"
+              >
+                <option value="Fall 2026">Fall 2026 Intake</option>
+                <option value="Spring 2027">Spring 2027 Intake</option>
+                <option value="Fall 2027">Fall 2027 Intake</option>
+                <option value="Rolling Admissions">Rolling Admissions</option>
+              </select>
+            </div>
+
+            {/* Academic Background / CGPA / % (7 cols) */}
+            <div className="md:col-span-7">
+              <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">
+                <span className="flex items-center gap-1.5">
+                  <GraduationCap className="w-3.5 h-3.5 text-stone-500" />
+                  Academic Background / GPA / CGPA / %
+                </span>
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. 85% / 8.5 CGPA (10 scale) / 3.6 GPA (4.0 scale) / First Class"
+                value={profile.academicScore || (profile.gpaPercent ? `${profile.gpaPercent}%` : "")}
+                onChange={(e) =>
+                  setProfile({
+                    ...profile,
+                    academicScore: e.target.value,
+                  })
+                }
+                className="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-amber-700/20 focus:border-amber-700 text-stone-900 font-medium placeholder:text-stone-400"
+              />
+            </div>
+          </div>
+
+          {/* Standardized & Language Tests Manager */}
+          <div className="pt-2 border-t border-stone-200/80">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2.5">
+              <label className="text-xs font-bold uppercase tracking-wider text-stone-700 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-amber-700" />
+                Standardized & Foreign Education Exams (Add Any Exam/Test Given)
+              </label>
+              <span className="text-[11px] text-stone-500">
+                IELTS, TOEFL, PTE, Duolingo, GRE, GMAT, SAT, ACT, German, French, etc.
               </span>
-            </label>
-            <select
-              value={profile.intakeTerm}
-              onChange={(e) => setProfile({ ...profile, intakeTerm: e.target.value })}
-              className="w-full px-3.5 py-2 rounded-lg border border-stone-300 text-sm bg-stone-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-700/20 focus:border-amber-700 transition-all font-medium text-stone-900"
-            >
-              <option value="Fall 2026">Fall 2026 Intake</option>
-              <option value="Spring 2027">Spring 2027 Intake</option>
-              <option value="Fall 2027">Fall 2027 Intake</option>
-              <option value="Rolling Admissions">Rolling Admissions</option>
-            </select>
-          </div>
+            </div>
 
-          {/* Academic GPA (3 cols) */}
-          <div className="md:col-span-3">
-            <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">
-              Academic GPA (%)
-            </label>
-            <input
-              type="number"
-              min="0"
-              max="100"
-              placeholder="e.g. 85%"
-              value={profile.gpaPercent ?? ""}
-              onChange={(e) =>
-                setProfile({
-                  ...profile,
-                  gpaPercent: e.target.value ? parseFloat(e.target.value) : undefined,
-                })
-              }
-              className="w-full px-3 py-2 rounded-lg border border-stone-300 text-sm bg-stone-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-700/20 focus:border-amber-700 text-stone-900 font-medium"
-            />
-          </div>
+            {/* Added Test Badges */}
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              {(profile.testScores && profile.testScores.length > 0) ? (
+                profile.testScores.map((test, tIdx) => (
+                  <span
+                    key={tIdx}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-stone-900 text-stone-50 text-xs font-medium shadow-xs border border-stone-800 animate-in fade-in duration-150"
+                  >
+                    <span className="font-semibold text-amber-300">{test.name}:</span>
+                    <span>{test.score}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveTestScore(test.name)}
+                      className="hover:bg-stone-700 rounded-full p-0.5 ml-1 text-stone-400 hover:text-stone-100 transition-colors"
+                      title="Remove exam"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))
+              ) : (
+                <span className="text-xs text-stone-400 italic">
+                  No standardized tests added yet. Use the selector below or 1-click test chips:
+                </span>
+              )}
+            </div>
 
-          {/* IELTS Band (2 cols) */}
-          <div className="md:col-span-2">
-            <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">
-              IELTS Band
-            </label>
-            <input
-              type="number"
-              min="0"
-              max="9"
-              step="0.5"
-              placeholder="e.g. 7.5"
-              value={profile.ielts ?? ""}
-              onChange={(e) =>
-                setProfile({
-                  ...profile,
-                  ielts: e.target.value ? parseFloat(e.target.value) : undefined,
-                })
-              }
-              className="w-full px-3 py-2 rounded-lg border border-stone-300 text-sm bg-stone-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-700/20 focus:border-amber-700 text-stone-900 font-medium"
-            />
-          </div>
+            {/* Quick 1-Click Common Test Adders */}
+            <div className="flex flex-wrap items-center gap-1.5 mb-3">
+              <span className="text-[11px] font-medium text-stone-500 mr-1">Quick Add:</span>
+              {[
+                { name: "IELTS", score: "7.5" },
+                { name: "TOEFL iBT", score: "102" },
+                { name: "PTE Academic", score: "68" },
+                { name: "Duolingo (DET)", score: "125" },
+                { name: "GRE", score: "320" },
+                { name: "GMAT", score: "700" },
+                { name: "SAT", score: "1400" },
+              ].map((rec) => (
+                <button
+                  key={rec.name}
+                  type="button"
+                  onClick={() => {
+                    setSelectedExamType(rec.name);
+                    setExamScoreInput(rec.score);
+                  }}
+                  className="text-[11px] px-2.5 py-0.5 rounded-full bg-white hover:bg-stone-100 text-stone-700 border border-stone-200 transition-colors"
+                >
+                  + {rec.name} ({rec.score})
+                </button>
+              ))}
+            </div>
 
-          {/* GRE / GMAT (3 cols) */}
-          <div className="md:col-span-3">
-            <label className="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">
-              GRE / GMAT (Optional)
-            </label>
-            <input
-              type="number"
-              placeholder="e.g. 320"
-              value={profile.greGmat ?? ""}
-              onChange={(e) =>
-                setProfile({
-                  ...profile,
-                  greGmat: e.target.value ? parseFloat(e.target.value) : undefined,
-                })
-              }
-              className="w-full px-3 py-2 rounded-lg border border-stone-300 text-sm bg-stone-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-700/20 focus:border-amber-700 text-stone-900 font-medium"
-            />
+            {/* Test Adder Input Bar */}
+            <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 bg-white p-2.5 rounded-xl border border-stone-200">
+              <div className="sm:col-span-5">
+                <select
+                  value={selectedExamType}
+                  onChange={(e) => setSelectedExamType(e.target.value)}
+                  className="w-full px-3 py-1.5 text-xs rounded-lg border border-stone-300 font-medium text-stone-900 bg-stone-50/50 focus:outline-none focus:ring-1 focus:ring-amber-700"
+                >
+                  {COMMON_EXAMS.map((exam) => (
+                    <option key={exam} value={exam}>
+                      {exam === "OTHER_CUSTOM_EXAM" ? "✏️ Other / Custom Foreign Test..." : exam}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {selectedExamType === "OTHER_CUSTOM_EXAM" && (
+                <div className="sm:col-span-3">
+                  <input
+                    type="text"
+                    placeholder="Exam name (e.g. TestDaF, LSAT, MCAT)..."
+                    value={customExamName}
+                    onChange={(e) => setCustomExamName(e.target.value)}
+                    className="w-full px-3 py-1.5 text-xs rounded-lg border border-amber-300 text-stone-900 font-medium placeholder:text-stone-400 focus:outline-none focus:ring-1 focus:ring-amber-700"
+                  />
+                </div>
+              )}
+
+              <div className={selectedExamType === "OTHER_CUSTOM_EXAM" ? "sm:col-span-2" : "sm:col-span-4"}>
+                <input
+                  type="text"
+                  placeholder="Score (e.g. 7.5 / 105 / 325)..."
+                  value={examScoreInput}
+                  onChange={(e) => setExamScoreInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleAddTestScore();
+                    }
+                  }}
+                  className="w-full px-3 py-1.5 text-xs rounded-lg border border-stone-300 text-stone-900 font-medium placeholder:text-stone-400 focus:outline-none focus:ring-1 focus:ring-amber-700"
+                />
+              </div>
+
+              <div className={selectedExamType === "OTHER_CUSTOM_EXAM" ? "sm:col-span-2" : "sm:col-span-3"}>
+                <button
+                  type="button"
+                  onClick={() => handleAddTestScore()}
+                  className="w-full py-1.5 px-3 bg-stone-900 hover:bg-stone-800 text-stone-50 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-1"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  Add Exam
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 

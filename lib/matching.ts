@@ -178,7 +178,9 @@ export function scoreProgrammes(
   });
 
   // Sort descending by score, tie-break by ranking/GPA
-  scored.sort((a, b) => b.score - a.score || b.gpaMinPercent - a.gpaMinPercent);
+  scored.sort(
+    (a, b) => b.score - a.score || (b.gpaMinPercent || 0) - (a.gpaMinPercent || 0)
+  );
 
   // Return top matching candidates
   return scored.slice(0, 8);
